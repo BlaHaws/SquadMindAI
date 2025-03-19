@@ -1,10 +1,29 @@
+"""
+Military Squad Advisor - Memory Module
+
+This module handles the persistence and retrieval of conversation history.
+It uses SQLite for thread-safe access and provides methods for storing
+user and AI messages, as well as retrieving context-aware conversation 
+history tailored to each squad member's role.
+"""
+
 import sqlite3
 import json
 import os
 from datetime import datetime
 
 class ConversationMemory:
-    """Manages conversation history and context for the squad debate system."""
+    """Manages conversation history and context for the squad debate system.
+    
+    The ConversationMemory class provides thread-safe database storage for conversation
+    history between the user and the AI squad members. It supports role-specific
+    context retrieval to help each AI personality focus on aspects of the conversation
+    most relevant to their role and expertise.
+    
+    Attributes:
+        conn: SQLite database connection object
+        cursor: SQLite cursor for executing queries
+    """
     
     def __init__(self, memory_file=":memory:"):
         """Initialize memory system with SQLite database.

@@ -1,3 +1,15 @@
+"""
+Military AI Squad Advisor - Streamlit Demo Application
+
+This application demonstrates the Military Squad Advisor package capabilities
+through an interactive web interface. Users can enter scenarios or questions
+and receive responses from five distinct AI personalities that interact in a
+military squad hierarchy.
+
+Author: AI Squad Team
+Date: March 2025
+"""
+
 import streamlit as st
 import time
 import uuid
@@ -128,60 +140,77 @@ prompt = st.chat_input("Enter your question or situation for the squad to discus
 
 # Process user input and generate responses
 if prompt and not st.session_state.debate_active:
-    # Add user message to chat
+    # Add user message to chat history display
     st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    # Store the current input for processing by the debate system
     st.session_state.current_input = prompt
+    
+    # Save the user message to the persistent memory database
     st.session_state.memory.add_user_message(prompt)
+    
+    # Set debate mode to active - this blocks new input until debate is complete
     st.session_state.debate_active = True
+    
+    # Rerun the app to show the user's message before starting the debate
     st.rerun()
 
-# Generate squad responses if debate is active
+# Generate squad responses if debate is active and not already processed
 if st.session_state.debate_active and st.session_state.debate_results is None:
     # Visual cue that the squad is thinking
     with st.spinner("Squad is discussing..."):
-        # Initialize the debate
+        # Initialize the debate system with all squad members and the memory
+        # This follows the military hierarchy structure defined in the package
         debate = SquadDebate(
-            st.session_state.squad["leader"],
-            st.session_state.squad["tactical"],
-            st.session_state.squad["medic"],
-            st.session_state.squad["scout"],
-            st.session_state.squad["comms"],
-            st.session_state.memory
+            leader=st.session_state.squad["leader"],
+            tactical_planner=st.session_state.squad["tactical"],
+            medic=st.session_state.squad["medic"],
+            scout=st.session_state.squad["scout"],
+            comms_specialist=st.session_state.squad["comms"],
+            memory=st.session_state.memory
         )
         
-        # Conduct the debate and get results
+        # Conduct the debate and get responses from all squad members
+        # The debate system handles the speaking order and interaction dynamics
         results = debate.conduct_debate(st.session_state.current_input)
         st.session_state.debate_results = results
     
-    # Process and display results
+    # Process each squad member's response sequentially for a natural conversation flow
     for member, response in st.session_state.debate_results.items():
-        # Skip empty responses
+        # Skip any empty responses (should not happen in normal operation)
         if not response.strip():
             continue
             
-        # Get personality details
+        # Get the personality object to access name and avatar
         personality = st.session_state.squad[member]
         
-        # Add to chat history
+        # Create a structured message object for the chat history
         message = {
-            "role": member,
-            "name": personality.name,
-            "content": response,
-            "avatar": personality.avatar
+            "role": member,                 # Used for styling/identification
+            "name": personality.name,       # Full character name
+            "content": response,            # The actual response text
+            "avatar": personality.avatar    # Emoji or image for the character
         }
+        
+        # Add to the visible chat history
         st.session_state.messages.append(message)
         
-        # Add to memory
+        # Store in persistent memory for future context
         st.session_state.memory.add_ai_message(personality.name, response)
         
-        # Add a small delay for a more natural conversation flow
+        # Update the display after each squad member responds
+        # This creates a sequential conversation effect
         st.rerun()
+        
+        # Small delay between responses for readability
         time.sleep(0.5)
     
-    # Reset for next input
+    # Reset the debate state for the next user input
     st.session_state.debate_active = False
     st.session_state.debate_results = None
     st.session_state.current_input = ""
+    
+    # Final refresh to update UI state
     st.rerun()
 
 # Footer
