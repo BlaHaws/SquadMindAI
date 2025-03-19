@@ -2,9 +2,16 @@ import streamlit as st
 import time
 import uuid
 import json
-from memory import ConversationMemory
-from personalities import Personality, Leader, TacticalPlanner, Medic, Scout, CommunicationsSpecialist
-from squad_logic import SquadDebate
+from military_squad_advisor import (
+    ConversationMemory,
+    Personality, 
+    Leader, 
+    TacticalPlanner, 
+    Medic, 
+    Scout, 
+    CommunicationsSpecialist,
+    SquadDebate
+)
 
 # Page configuration
 st.set_page_config(
