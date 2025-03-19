@@ -5,7 +5,7 @@ class Personality:
         self.name = name
         self.role = role
         self.traits = traits
-        self.authority_level = authority_level  # 1-4, with 1 being highest
+        self.authority_level = authority_level  # 1-5, with 1 being highest
         self.avatar = avatar
         
     def generate_response(self, user_input, conversation_history, squad_responses=None):
@@ -287,4 +287,81 @@ class Scout(Personality):
         """Generate initial observations if speaking first (rare)."""
         response = "Reporting what I see: This situation has several notable aspects that might influence our approach. "
         response += "I'll continue monitoring and provide updates as the picture develops."
+        return response
+
+
+class CommunicationsSpecialist(Personality):
+    """The communications specialist - focuses on interpersonal dynamics and negotiation."""
+    
+    def __init__(self):
+        super().__init__(
+            name="Sgt. Morgan",
+            role="Communications Specialist",
+            traits=["diplomatic", "persuasive", "perceptive", "adaptive"],
+            authority_level=5,  # Support role with specialized authority in communications
+            avatar="📡"
+        )
+        
+        # Specific personality parameters
+        self.communication_style = {
+            "tone": "adaptable and nuanced",
+            "language": "clear with emotional intelligence",
+            "perspective": "relationship-focused, communication dynamics"
+        }
+        
+    def generate_response(self, user_input, conversation_history, squad_responses=None):
+        """Generate a response focusing on communication strategy and interpersonal dynamics."""
+        # Context analysis
+        context = self._analyze_context(conversation_history)
+        
+        # If responding after others
+        if squad_responses:
+            return self._generate_communication_assessment(user_input, context, squad_responses)
+        
+        # If speaking first (rare)
+        return self._generate_initial_communication_thoughts(user_input, context)
+    
+    def _analyze_context(self, conversation_history):
+        """Extract relevant communication patterns from conversation history."""
+        recent_exchanges = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
+        return recent_exchanges
+    
+    def _generate_communication_assessment(self, user_input, context, squad_responses):
+        """Generate a communication assessment based on the situation and squad responses."""
+        response = "From a communications perspective, here's what we're dealing with:\n\n"
+        
+        # Add communication insights
+        response += "The way we frame and deliver our message will be critical here. "
+        
+        # Analyze communication dynamics in the current conversation
+        if "leader" in squad_responses and "tactical" in squad_responses:
+            if "disagree" in squad_responses["tactical"].lower() or "challenge" in squad_responses["tactical"].lower():
+                response += "I'm noticing some tension in our internal communications. "
+                response += "We should align our messaging before engaging externally. "
+                response += "A unified front with clear roles will strengthen our position."
+            else:
+                response += "Our internal alignment is solid, which gives us an advantage. "
+                response += "We should leverage this unity in our external communications."
+        
+        # Add specific communication strategy
+        response += "\n\nI recommend a communication strategy that:\n"
+        response += "1. Establishes clear channels with all stakeholders\n"
+        response += "2. Uses active listening techniques to gather intelligence\n"
+        response += "3. Adapts our tone and approach based on the other party's responses\n\n"
+        
+        # Address specific tactical or ethical concerns
+        if "tactical" in squad_responses and "risk" in squad_responses["tactical"].lower():
+            response += "Lt. Rodriguez's concern about risk factors should influence how we communicate. "
+            response += "We should project confidence while avoiding overpromising on outcomes."
+        
+        if "medic" in squad_responses and "ethical" in squad_responses["medic"].lower():
+            response += "Dr. Chen's ethical considerations should be woven into our messaging. "
+            response += "We'll build more trust if we acknowledge the human elements at stake."
+        
+        return response
+    
+    def _generate_initial_communication_thoughts(self, user_input, context):
+        """Generate initial communication thoughts if speaking first (rare)."""
+        response = "Initial communication assessment: How we approach the conversation here will set the tone. "
+        response += "We should establish rapport first, then gather information before committing to a specific strategy."
         return response

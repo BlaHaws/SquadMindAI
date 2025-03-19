@@ -3,7 +3,7 @@ import time
 import uuid
 import json
 from memory import ConversationMemory
-from personalities import Personality, Leader, TacticalPlanner, Medic, Scout
+from personalities import Personality, Leader, TacticalPlanner, Medic, Scout, CommunicationsSpecialist
 from squad_logic import SquadDebate
 
 # Page configuration
@@ -41,7 +41,8 @@ if "squad" not in st.session_state:
         "leader": Leader(),
         "tactical": TacticalPlanner(),
         "medic": Medic(),
-        "scout": Scout()
+        "scout": Scout(),
+        "comms": CommunicationsSpecialist()
     }
 
 # Header

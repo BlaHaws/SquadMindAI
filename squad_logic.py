@@ -1,7 +1,7 @@
 class SquadDebate:
     """Manages the debate and decision-making process between squad members."""
     
-    def __init__(self, leader, tactical_planner, medic, scout, memory):
+    def __init__(self, leader, tactical_planner, medic, scout, comms_specialist, memory):
         """Initialize the squad debate system.
         
         Args:
@@ -9,12 +9,14 @@ class SquadDebate:
             tactical_planner: Tactical Planner personality object
             medic: Medic personality object
             scout: Scout personality object
+            comms_specialist: Communications Specialist personality object
             memory: ConversationMemory object for context
         """
         self.leader = leader
         self.tactical_planner = tactical_planner
         self.medic = medic
         self.scout = scout
+        self.comms_specialist = comms_specialist
         self.memory = memory
         
         # Define squad hierarchy and speaking order
@@ -22,11 +24,12 @@ class SquadDebate:
             "leader": self.leader,
             "tactical": self.tactical_planner,
             "medic": self.medic,
-            "scout": self.scout
+            "scout": self.scout,
+            "comms": self.comms_specialist
         }
         
         # Standard speaking order follows hierarchy (can be changed)
-        self.standard_speaking_order = ["leader", "tactical", "medic", "scout"]
+        self.standard_speaking_order = ["leader", "tactical", "medic", "scout", "comms"]
     
     def conduct_debate(self, user_input):
         """Conduct a full squad debate on the user input.
@@ -142,6 +145,12 @@ class SquadDebate:
             tactical_followup = "We can address the ethical concerns while maintaining tactical effectiveness. "
             tactical_followup += "I'll incorporate these considerations into the revised approach."
             responses["tactical"] += "\n\n**Follow-up:** " + tactical_followup
+            
+        # Communications specialist might mediate disagreements
+        if "tactical" in responses and "leader" in responses and "disagree" in responses["tactical"].lower():
+            comms_followup = "If I may interject, I think we can find common ground between these perspectives. "
+            comms_followup += "Both approaches have merit, and a synthesized solution might be optimal here."
+            responses["comms"] += "\n\n**Follow-up:** " + comms_followup
     
     def get_final_decision(self, responses):
         """Extract the final decision from the debate.
@@ -175,7 +184,7 @@ class SquadDebate:
         # For now, we'll return a simplified assessment
         
         # Check if all squad members responded
-        full_squad = len(responses) == 4
+        full_squad = len(responses) == 5
         
         # Mock consensus detection (would be more sophisticated with LLMs)
         consensus = {
@@ -183,5 +192,13 @@ class SquadDebate:
             "strength": "low",
             "description": "The squad has differing perspectives on this matter."
         }
+        
+        # If the communications specialist has weighed in, they might help build consensus
+        if "comms" in responses:
+            agreement_markers = ["common ground", "synthesis", "agreement", "align", "compromise"]
+            if any(marker in responses["comms"].lower() for marker in agreement_markers):
+                consensus["exists"] = True
+                consensus["strength"] = "moderate"
+                consensus["description"] = "The squad is working toward alignment, with the communications specialist helping bridge differences."
         
         return consensus
