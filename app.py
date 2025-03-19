@@ -86,7 +86,16 @@ with st.sidebar:
         
         **Traits**: Observant, curious, detail-focused
         
-        **Authority**: Lowest in hierarchy but valued for information
+        **Authority**: Low in hierarchy but valued for information
+        """)
+        
+    with st.expander("The Communications Specialist", expanded=True):
+        st.markdown("""
+        **Role**: Manages communication strategy and interpersonal dynamics
+        
+        **Traits**: Diplomatic, persuasive, perceptive, adaptive
+        
+        **Authority**: Specialized authority in communications and negotiation
         """)
     
     st.divider()
@@ -129,6 +138,7 @@ if st.session_state.debate_active and st.session_state.debate_results is None:
             st.session_state.squad["tactical"],
             st.session_state.squad["medic"],
             st.session_state.squad["scout"],
+            st.session_state.squad["comms"],
             st.session_state.memory
         )
         
