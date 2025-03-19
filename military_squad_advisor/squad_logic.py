@@ -1,5 +1,30 @@
+"""
+Military Squad Advisor - Squad Logic Module
+
+This module orchestrates the debate and decision-making process between
+different AI personalities in the squad. It manages speaking order,
+interaction dynamics, and consensus detection to create realistic debates
+that follow military-style hierarchy while allowing for constructive challenges.
+"""
+
 class SquadDebate:
-    """Manages the debate and decision-making process between squad members."""
+    """Manages the debate and decision-making process between squad members.
+    
+    The SquadDebate class coordinates how different personalities interact,
+    controlling the flow of conversation, speaking order, and final decision-making.
+    It handles special cases like ethical concerns or tactical challenges that
+    might temporarily modify the usual chain of command.
+    
+    Attributes:
+        leader: Leader personality object
+        tactical_planner: Tactical Planner personality object  
+        medic: Medic personality object
+        scout: Scout personality object
+        comms_specialist: Communications Specialist personality object
+        memory: ConversationMemory object for context retrieval
+        hierarchy: Dictionary mapping role names to personality objects
+        standard_speaking_order: List defining the default order of responses
+    """
     
     def __init__(self, leader, tactical_planner, medic, scout, comms_specialist, memory):
         """Initialize the squad debate system.

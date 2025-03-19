@@ -1,5 +1,33 @@
+"""
+Military Squad Advisor - Personalities Module
+
+This module defines the different AI personality classes that make up the advisory squad.
+Each personality has unique traits, communication styles, and decision-making approaches
+that influence how they respond to user inputs and interact with other squad members.
+
+The module implements a military-inspired hierarchy with five specialized roles:
+- Leader: Makes final decisions and takes responsibility
+- Tactical Planner: Analyzes situations and develops strategies
+- Medic: Focuses on wellbeing and ethical considerations
+- Scout: Observes and gathers information
+- Communications Specialist: Manages interpersonal dynamics and negotiation
+"""
+
 class Personality:
-    """Base class for all AI personalities in the squad."""
+    """Base class for all AI personalities in the squad.
+    
+    This abstract base class defines the common interface and properties
+    for all personality types in the system. Each specific personality
+    should inherit from this class and implement its own response generation
+    logic based on its unique traits and role.
+    
+    Attributes:
+        name (str): Character name of the personality
+        role (str): Military/functional role in the squad
+        traits (list): List of defining personality traits
+        authority_level (int): Hierarchical rank (1-5, with 1 being highest)
+        avatar (str): Visual representation (emoji or image path)
+    """
     
     def __init__(self, name, role, traits, authority_level, avatar):
         self.name = name
