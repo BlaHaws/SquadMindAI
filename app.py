@@ -19,7 +19,9 @@ if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 
 if "memory" not in st.session_state:
-    st.session_state.memory = ConversationMemory()
+    # Use a file-based database for persistence between sessions
+    db_file = "squad_conversation.db"
+    st.session_state.memory = ConversationMemory(memory_file=db_file)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []

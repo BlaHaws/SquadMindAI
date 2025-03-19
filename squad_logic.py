@@ -56,12 +56,92 @@ class SquadDebate:
             
             # Store response
             responses[role] = response
+            
+            # Determine if we should modify the speaking order based on the situation
+            if role == "leader" and self._should_challenge_leader(user_input):
+                # For certain topics, tactical might speak next regardless of hierarchy
+                self._adjust_speaking_order("tactical")
+            elif role == "medic" and self._has_ethical_concerns(response):
+                # If medic raises ethical concerns, they might get more priority
+                self._adjust_speaking_order("medic")
         
-        # Potential second round (follow-up comments) could be implemented here
-        # For now, we'll keep it simple with just one round
+        # Advanced feature: Add follow-up responses or rebuttals for more complex debates
+        # This could be expanded with real LLM capabilities
+        if self._is_complex_situation(user_input, responses):
+            self._add_follow_up_responses(responses, user_input, conversation_history)
         
         # Return all responses
         return responses
+        
+    def _should_challenge_leader(self, user_input):
+        """Determine if the situation is one where the leader should be challenged.
+        
+        In a real implementation, this would analyze the user input with NLP.
+        """
+        challenging_topics = ["risk", "danger", "uncertain", "casualties", "loss", "failure"]
+        return any(topic in user_input.lower() for topic in challenging_topics)
+    
+    def _has_ethical_concerns(self, response):
+        """Check if the response contains ethical concerns.
+        
+        In a real implementation, this would use sentiment analysis.
+        """
+        ethical_signals = ["ethical", "moral", "concern", "civilian", "harm", "rights"]
+        return any(signal in response.lower() for signal in ethical_signals)
+    
+    def _adjust_speaking_order(self, priority_role):
+        """Temporarily adjust speaking order to prioritize a specific role.
+        
+        In a military context, sometimes the situation demands breaking protocol.
+        """
+        # This is a simple implementation - it would be more sophisticated in a real system
+        if priority_role in self.standard_speaking_order:
+            # Move the priority role to speak immediately after the leader
+            order = self.standard_speaking_order.copy()
+            order.remove(priority_role)
+            leader_index = order.index("leader") if "leader" in order else -1
+            if leader_index >= 0:
+                order.insert(leader_index + 1, priority_role)
+                self.standard_speaking_order = order
+    
+    def _is_complex_situation(self, user_input, responses):
+        """Determine if the situation requires more complex debate handling.
+        
+        In a real implementation, this would be determined based on LLM analysis.
+        """
+        # Simple implementation - check if the input is longer (likely more complex)
+        # and if there are disagreements in the responses
+        has_disagreements = False
+        
+        # Check for disagreement indicators in the responses
+        disagreement_markers = ["disagree", "contrary", "challenge", "different", "opposing"]
+        
+        for response in responses.values():
+            if any(marker in response.lower() for marker in disagreement_markers):
+                has_disagreements = True
+                break
+        
+        return len(user_input.split()) > 15 or has_disagreements
+    
+    def _add_follow_up_responses(self, responses, user_input, conversation_history):
+        """Add additional responses to create a more dynamic debate.
+        
+        This would simulate squad members responding to each other's points.
+        """
+        # In a real implementation, this would generate follow-up responses based on LLM
+        # For this demo, we'll add simple follow-ups
+        
+        # Leader might respond to tactical challenges
+        if "tactical" in responses and "challenge" in responses["tactical"].lower():
+            leader_followup = "I've considered the tactical assessment, but we need to maintain mission focus. "
+            leader_followup += "The concerns are noted but we'll proceed as planned with slight adjustments."
+            responses["leader"] += "\n\n**Follow-up:** " + leader_followup
+        
+        # Tactical might respond to medic's ethical concerns
+        if "medic" in responses and "ethical" in responses["medic"].lower():
+            tactical_followup = "We can address the ethical concerns while maintaining tactical effectiveness. "
+            tactical_followup += "I'll incorporate these considerations into the revised approach."
+            responses["tactical"] += "\n\n**Follow-up:** " + tactical_followup
     
     def get_final_decision(self, responses):
         """Extract the final decision from the debate.

@@ -12,7 +12,7 @@ class ConversationMemory:
         Args:
             memory_file: Path to SQLite database file, or ":memory:" for in-memory database
         """
-        self.conn = sqlite3.connect(memory_file)
+        self.conn = sqlite3.connect(memory_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
         self._initialize_database()
         
@@ -88,6 +88,47 @@ class ConversationMemory:
             formatted += f"{msg['speaker']}: {msg['content']}\n\n"
         
         return formatted
+        
+    def get_role_specific_context(self, role, limit=10):
+        """Get conversation context tailored to a specific squad role.
+        
+        Different personality roles might focus on different aspects of the conversation.
+        
+        Args:
+            role: The squad role requesting context (leader, tactical, medic, scout)
+            limit: Maximum number of messages to include
+            
+        Returns:
+            Context string tailored to the specific role
+        """
+        history = self.get_conversation_history(limit)
+        
+        # Base context includes all recent messages
+        context = "Recent conversation history:\n\n"
+        
+        # Add role-specific emphasis to certain messages
+        for msg in history:
+            # Highlight messages that would be particularly relevant to this role
+            if role == "leader" and msg["speaker"] in ["Commander Harris", "User"]:
+                # Leaders focus on user needs and their own previous decisions
+                context += f"[IMPORTANT] {msg['speaker']}: {msg['content']}\n\n"
+            elif role == "tactical" and any(keyword in msg["content"].lower() 
+                                          for keyword in ["strategy", "risk", "approach", "plan", "tactical"]):
+                # Tactical focuses on strategy discussions
+                context += f"[RELEVANT] {msg['speaker']}: {msg['content']}\n\n"
+            elif role == "medic" and any(keyword in msg["content"].lower() 
+                                       for keyword in ["ethical", "human", "harm", "safety", "concern"]):
+                # Medic focuses on ethical and wellbeing aspects
+                context += f"[PRIORITY] {msg['speaker']}: {msg['content']}\n\n"
+            elif role == "scout" and any(keyword in msg["content"].lower() 
+                                      for keyword in ["observe", "detail", "information", "see", "data"]):
+                # Scout focuses on observations and details
+                context += f"[NOTICE] {msg['speaker']}: {msg['content']}\n\n"
+            else:
+                # Regular formatting for other messages
+                context += f"{msg['speaker']}: {msg['content']}\n\n"
+        
+        return context
     
     def clear(self):
         """Clear all conversation history."""
